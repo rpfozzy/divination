@@ -2,16 +2,102 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Гадание по имени и фамилии</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            margin-bottom: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .number {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            color: #333;
+        }
+        .description {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #555;
+        }
+        .calculation-details {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .calculation-details pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
 </head>
 <body>
-    <h1>Гадание по имени и фамилии</h1>
-    <form id="form">
-        <label for="fullName">Введите имя и фамилию:</label>
-        <input type="text" id="fullName" name="fullName" required>
-        <button type="button" onclick="calculate()">Рассчитать</button>
-    </form>
-    <p id="result"></p>
+    <div class="container">
+        <h1>Гадание по имени и фамилии</h1>
+        <form id="form">
+            <label for="fullName">Введите имя и фамилию:</label>
+            <input type="text" id="fullName" name="fullName" required>
+            <button type="button" onclick="calculate()">Рассчитать</button>
+        </form>
+        <div id="result">
+            <div class="number"></div>
+            <div class="description"></div>
+        </div>
+    </div>
+    <div class="container calculation-details">
+        <h2>Детали расчета</h2>
+        <pre id="calculation"></pre>
+    </div>
 
     <script>
         const letterValues = {
@@ -104,15 +190,19 @@
             const fullName = document.getElementById('fullName').value.toUpperCase().replace(/[^А-ЯЁ]/g, '');
             let total = 0;
             let digits = [];
+            let calculations = ''; // Для хранения деталей расчетов
             for (let letter of fullName) {
                 if (letter in letterValues) {
                     total += letterValues[letter];
                     digits.push(letterValues[letter]);
+                    calculations += `${letter} (${letterValues[letter]}) + `;
                 }
             }
+            calculations = calculations.slice(0, -3); // Удаляем последний плюс
+
             const result = total;
             let description = '';
-            
+
             // Разделить результат на компоненты, если значение отсутствует в таблице
             if (!(result in shortTable)) {
                 let tempResult = result;
@@ -137,7 +227,9 @@
             }
 
             // Вывод результата
-            document.getElementById('result').textContent = `Значение: ${result}\n${description}`;
+            document.querySelector('.number').textContent = `Число: ${result}`;
+            document.querySelector('.description').textContent = description;
+            document.getElementById('calculation').textContent = `Расчет: ${calculations} = ${result}`;
         }
     </script>
 </body>
