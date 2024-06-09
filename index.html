@@ -79,6 +79,20 @@
             white-space: pre-wrap;
             word-wrap: break-word;
         }
+        
+        .fade {
+    opacity: 0;
+    animation: fadeIn 1s forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
     </style>
 </head>
 <body>
@@ -115,6 +129,7 @@
             6: 'Удача, освобождение, труд.',
             7: 'Несовершенство, бедность, покушение, слабость.',
             8: 'Справедливость, величие, самообладание, достоинство.',
+            9: 'Свободолюбие',
             10: 'Совершенство, рассудок, гармония души и тела, будущее счастье, закон и законность.',
             11: 'Раздор, противозаконие, преступление.',
             12: 'Любовь к жизни, спокойствие, свобода, девственность, целомудрие, мудрость.',
@@ -186,51 +201,53 @@
             1390: 'Преследование.'
         };
 
-        function calculate() {
-            const fullName = document.getElementById('fullName').value.toUpperCase().replace(/[^А-ЯЁ]/g, '');
-            let total = 0;
-            let digits = [];
-            let calculations = ''; // Для хранения деталей расчетов
-            for (let letter of fullName) {
-                if (letter in letterValues) {
-                    total += letterValues[letter];
-                    digits.push(letterValues[letter]);
-                    calculations += `${letter} (${letterValues[letter]}) + `;
-                }
-            }
-            calculations = calculations.slice(0, -3); // Удаляем последний плюс
+        document.getElementById('fullName').addEventListener('input', calculate);
 
-            const result = total;
-            let description = '';
-
-            // Разделить результат на компоненты, если значение отсутствует в таблице
-            if (!(result in shortTable)) {
-                let tempResult = result;
-                let components = [];
-                const keys = Object.keys(shortTable).map(Number).sort((a, b) => b - a);
-                for (let key of keys) {
-                    while (tempResult >= key) {
-                        components.push(key);
-                        tempResult -= key;
-                    }
-                }
-                for (let component of components) {
-                    description += `${component} - ${shortTable[component]}\n`;
-                }
-                // Суммировать цифры результата и получить соответствующее значение
-                const sumOfDigits = result.toString().split('').map(Number).reduce((a, b) => a + b, 0);
-                if (sumOfDigits in shortTable) {
-                    description += `${sumOfDigits} - ${shortTable[sumOfDigits]}`;
-                }
-            } else {
-                description = `${result} - ${shortTable[result]}`;
-            }
-
-            // Вывод результата
-            document.querySelector('.number').textContent = `Число: ${result}`;
-            document.querySelector('.description').textContent = description;
-            document.getElementById('calculation').textContent = `Расчет: ${calculations} = ${result}`;
+function calculate() {
+    const fullName = this.value.toUpperCase().replace(/[^А-ЯЁ]/g, '');
+    let total = 0;
+    let digits = [];
+    let calculations = ''; // Для хранения деталей расчетов
+    for (let letter of fullName) {
+        if (letter in letterValues) {
+            total += letterValues[letter];
+            digits.push(letterValues[letter]);
+            calculations += `${letter} (${letterValues[letter]}) + <br>`; // добавляем <br> для перехода на новую строку
         }
+    }
+    calculations = calculations.slice(0, -4); // Удаляем последний плюс и пробел
+
+    const result = total;
+    let description = '';
+
+    // Разделить результат на компоненты, если значение отсутствует в таблице
+    if (!(result in shortTable)) {
+        let tempResult = result;
+        let components = [];
+        const keys = Object.keys(shortTable).map(Number).sort((a, b) => b - a);
+        for (let key of keys) {
+            while (tempResult >= key) {
+                components.push(key);
+                tempResult -= key;
+            }
+        }
+        for (let component of components) {
+            description += `${component} - ${shortTable[component]}<br>`; // добавляем <br> для перехода на новую строку
+        }
+        // Суммировать цифры результата и получить соответствующее значение
+        const sumOfDigits = result.toString().split('').map(Number).reduce((a, b) => a + b, 0);
+        if (sumOfDigits in shortTable) {
+            description += `${sumOfDigits} - ${shortTable[sumOfDigits]}`;
+        }
+    } else {
+        description = `${result} - ${shortTable[result]}`;
+    }
+
+    // Вывод результата
+document.querySelector('.number').innerHTML = `<span class="fade">${result}</span><br><br>`;
+document.querySelector('.description').innerHTML = `<span class="fade">${description}</span>`;
+document.getElementById('calculation').innerHTML = `Расчет: <br><span class="fade">${calculations}</span> = <span class="fade">${result}</span>`;
+}
     </script>
 </body>
 </html>
