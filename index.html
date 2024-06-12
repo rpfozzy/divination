@@ -155,17 +155,17 @@
         <!-- Footer content -->
     </div>
 
-  
+
 
 
 
     <script>
-      
+
         const letterValues = {
             'А': 1, 'Б': 2, 'В': 3, 'Г': 4, 'Д': 5, 'Е': 6, 'Ё': 6, 'Ж': 7, 'З': 8, 'И': 9, 'Й': 9, 'К': 10, 'Л': 20, 'М': 30,
             'Н': 40, 'О': 50, 'П': 60, 'Р': 70, 'С': 80, 'Т': 90, 'У': 100, 'Ф': 200, 'Х': 300, 'Ц': 400, 'Ч': 500, 'Ш': 600,
             'Щ': 700, 'Ы': 9, 'Э': 6, 'Ю': 800, 'Я': 900
-        
+
         };
 
         const shortTable = {
@@ -255,73 +255,79 @@
             1390: 'Преследование.'
         };
 
-        document.getElementById('fullName').addEventListener('input', calculate);
+         document.getElementById('fullName').addEventListener('input', calculate);
 
-function calculate() {
-    const fullName = this.value.toUpperCase().replace(/[^А-ЯЁ]/g, '');
-    let total = 0;
-    let digits = [];
-    let calculations = ''; // Для хранения деталей расчетов
-    for (let letter of fullName) {
-        if (letter in letterValues) {
-            total += letterValues[letter];
-            digits.push(letterValues[letter]);
-            calculations += `${letter} (${letterValues[letter]}) + <br>`; // добавляем <br> для перехода на новую строку
+        function calculate() {
+            const fullName = this.value.toUpperCase().replace(/[^А-ЯЁ]/g, '');
+            let total = 0;
+            let digits = [];
+            let calculations = ''; // Для хранения деталей расчетов
+            for (let letter of fullName) {
+                if (letter in letterValues) {
+                    total += letterValues[letter];
+                    digits.push(letterValues[letter]);
+                    calculations += `${letter} (${letterValues[letter]}) + <br>`; // добавляем <br> для перехода на новую строку
+                }
+            }
+            calculations = calculations.slice(0, -4); // Удаляем последний плюс и пробел
+
+            const result = total;
+            let description = '';
+
+            // Измененный способ разделения числа
+            let components = [];
+            let remaining = result;
+
+            // Разделение числа на компоненты
+            if (remaining >= 1000) {
+                components.push(1000);
+                remaining %= 1000; // После добавления 1000 оставшееся число должно быть меньше 1000
+            }
+            if (remaining >= 100) {
+                components.push(Math.floor(remaining / 100) * 100);
+                remaining %= 100;
+            }
+            if (remaining >= 10) {
+                components.push(Math.floor(remaining / 10) * 10);
+                remaining %= 10;
+            }
+            if (remaining >= 1) {
+                components.push(remaining);
+            }
+
+            // Добавляем 1260, если оно существует
+            if (result in shortTable) {
+                description += `${result} - ${shortTable[result]}<br>`;
+            }
+
+            // Описание компонентов
+            for (let component of components) {
+                description += `${component} - ${shortTable[component] || ''}<br>`; // добавляем <br> для перехода на новую строку
+            }
+
+            // Вывод последних двух цифр суммы
+            let lastTwoDigits = result % 100;
+            description += `${lastTwoDigits} - ${shortTable[lastTwoDigits] || ''}<br>`;
+
+            // Суммирование цифр результата
+            const sumOfDigits = result.toString().split('').map(Number).reduce((a, b) => a + b, 0);
+            if (sumOfDigits in shortTable) {
+                description += `${sumOfDigits} - ${shortTable[sumOfDigits]}`;
+            }
+
+            // Нахождение последней цифры результата
+            const lastDigit = result % 10;
+
+            // Вывод результата
+            document.querySelector('.number').innerHTML = `<span class="fade">${result}</span><br><br>`;
+            document.querySelector('.description').innerHTML = `<span class="fade">${description}</span>`;
+            document.getElementById('calculation').innerHTML = `Расчет: <br><span class="fade">${calculations}</span> = <span class="fade">${result}</span>`;
+
+            // Дополнительный тип расчета: сумма общей имени и фамилии
+            const fullNameTotal = fullName.split('').reduce((acc, letter) => acc + (letter in letterValues ? letterValues[letter] : 0), 0);
+            document.getElementById('anotherCalculation').innerHTML = `Сумма имени и фамилии: <span class="fade">${fullNameTotal}</span>`;
+            document.getElementById('lastDigit').innerHTML = `Последняя цифра: <span class="fade">${lastDigit}</span>`;
         }
-    }
-    calculations = calculations.slice(0, -4); // Удаляем последний плюс и пробел
-
-    const result = total;
-    let description = '';
-
-   // Измененный способ разделения числа
-let components = [];
-let remaining = result;
-
-// Разделение числа на компоненты
-if (remaining >= 1000) {
-    components.push(1000);
-    remaining %= 1000; // После добавления 1000 оставшееся число должно быть меньше 1000
-}
-if (remaining >= 100) {
-    components.push(Math.floor(remaining / 100) * 100);
-    remaining %= 100;
-}
-if (remaining >= 10) {
-    components.push(Math.floor(remaining / 10) * 10);
-    remaining %= 10;
-}
-if (remaining >= 1) {
-    components.push(remaining);
-}
-
-    // Описание компонентов
-    for (let component of components) {
-        description += `${component} - ${shortTable[component] || ''}<br>`; // добавляем <br> для перехода на новую строку
-    }
- // Вывод последних двух цифр суммы
-    let lastTwoDigits = result % 100;
-    description += `${lastTwoDigits} - ${shortTable[lastTwoDigits] || ''}<br>`;
-
-   // Суммирование цифр результата
-const sumOfDigits = result.toString().split('').map(Number).reduce((a, b) => a + b, 0);
-if (sumOfDigits in shortTable) {
-    description += `${sumOfDigits} - ${shortTable[sumOfDigits]}`;
-}
-
-    // Нахождение последней цифры результата
-    const lastDigit = result % 10;
-
-    // Вывод результата
-    document.querySelector('.number').innerHTML = `<span class="fade">${result}</span><br><br>`;
-    document.querySelector('.description').innerHTML = `<span class="fade">${description}</span>`;
-    document.getElementById('calculation').innerHTML = `Расчет: <br><span class="fade">${calculations}</span> = <span class="fade">${result}</span>`;
-
-    // Дополнительный тип расчета: сумма общей имени и фамилии
-    const fullNameTotal = fullName.split('').reduce((acc, letter) => acc + (letter in letterValues ? letterValues[letter] : 0), 0);
-    document.getElementById('anotherCalculation').innerHTML = `Сумма имени и фамилии: <span class="fade">${fullNameTotal}</span>`;
-    document.getElementById('lastDigit').innerHTML = `Последняя цифра: <span class="fade">${lastDigit}</span>`;
-} 
     </script>
 </body>
 </html>
